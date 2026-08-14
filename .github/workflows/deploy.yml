@@ -1,8 +1,11 @@
 name: Deploy to GitHub Pages
 
+# Тригер на push навмисно вимкнений: Actions на акаунті заблоковані по білінгу,
+# кожен пуш давав червоний ран. Поки що деплой іде через scripts/deploy.sh.
+# Коли Actions запрацюють — розкоментуйте push і приберіть ручний скрипт.
 on:
-  push:
-    branches: [main]
+  # push:
+  #   branches: [main]
   workflow_dispatch:
 
 permissions:
