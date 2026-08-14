@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+:root {
+  /* Єдиний акцентний колір для всіх активних станів сцени */
+  --accent: #0e9f6e;
+  --accent-soft: rgba(14, 159, 110, 0.1);
+
+  --surface: #ffffff;
+  --page: #f5f6f8;
+  --ink: #14181f;
+  --ink-2: #5b6472;
+  --ink-3: #98a1ae;
+
+  --radius-card: 16px;
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.06);
+  --hairline: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+@theme inline {
+  --color-accent: var(--accent);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------- *
+ *  Базові поверхні
+ * ---------------------------------------------------------------- */
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  border: var(--hairline);
+}
+
+/* ---------------------------------------------------------------- *
+ *  Стан "до анімації".
+ *
+ *  Розмітка на сервері віддається у фінальному статичному стані —
+ *  тому HTML одразу осмислений і без стрибка при гідрації.
+ *  Атрибут data-anim="on" ставиться синхронно у useLayoutEffect
+ *  (до першого паркадру), тому елементи ховаються ще до того,
+ *  як GSAP підвантажиться динамічним import().
+ * ---------------------------------------------------------------- */
+
+[data-anim="on"] [data-el="bubble"],
+[data-anim="on"] [data-el="ticks"],
+[data-anim="on"] [data-el="card"],
+[data-anim="on"] [data-el="card-line"],
+[data-anim="on"] [data-el="cell"],
+[data-anim="on"] [data-el="cell-fill"],
+[data-anim="on"] [data-el="badge"],
+[data-anim="on"] [data-el="toast"],
+[data-anim="on"] [data-el="counter"] {
+  opacity: 0;
+}
+
+[data-anim="on"] [data-el="check"] {
+  stroke-dashoffset: 22;
+}
+
+/* Курсор набору: видимий лише поки йде друк */
+.caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 1em;
+  vertical-align: -0.15em;
+  background: currentColor;
+  opacity: 0;
+}
+
+[data-typing="1"] .caret {
+  animation: caret-blink 1s steps(1, end) infinite;
+}
+
+@keyframes caret-blink {
+  0%,
+  49% {
+    opacity: 0.9;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Хвіст повідомлення, який ще не надрукований: місце тримає, але не видно.
+   На сервері цей вузол порожній, тож прихованого тексту в HTML немає. */
+.rest {
+  opacity: 0;
+}
+
+/* Тільки трансформи та opacity — підказка композитору */
+[data-el="bubble"],
+[data-el="card"],
+[data-el="toast"],
+[data-el="badge"],
+[data-el="cell"] {
+  will-change: transform, opacity;
+}
+
+/* ---------------------------------------------------------------- *
+ *  Календар: бейджі-пілюлі
+ *  Мобайл — звичайний потік під тижнем, десктоп — приклеєні до комірки.
+ * ---------------------------------------------------------------- */
+
+.cal-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+@media (min-width: 768px) {
+  .cal-badges {
+    position: absolute;
+    inset: 0;
+    display: block;
+    margin: 0;
+    pointer-events: none;
+  }
+
+  /* Обгортка тримає позицію (лівий край — одразу за коміркою),
+     GSAP анімує вкладену пілюлю, тому трансформи не конфліктують. */
+  .cal-badge {
+    position: absolute;
+    left: calc((var(--col) + 1) * (100% / 7));
+    top: calc(var(--row) * (100% / 5) + (100% / 10));
+    transform: translate(6px, -50%);
+    white-space: nowrap;
+  }
+}
+
+/* Плавне гасіння сцени робить GSAP; тут — лише safety для reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
