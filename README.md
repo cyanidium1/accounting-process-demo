@@ -63,6 +63,18 @@ npm run dev
 
 ## Деплой
 
-Статичний експорт (`output: "export"`) → GitHub Pages через
-`.github/workflows/deploy.yml`. `NEXT_PUBLIC_BASE_PATH` задає префікс шляху
-для project-сторінки.
+Статичний експорт (`output: "export"`) → GitHub Pages.
+`NEXT_PUBLIC_BASE_PATH` задає префікс шляху для project-сторінки.
+
+Живий сайт: https://cyanidium1.github.io/accounting-process-demo/
+
+Два шляхи:
+
+- `.github/workflows/deploy.yml` — збірка через GitHub Actions (основний,
+  вмикається, коли Actions доступні на акаунті);
+- `scripts/deploy.sh` — локальна збірка й пуш `out/` у гілку `gh-pages`.
+  Використовується зараз, бо Actions на акаунті заблоковані по білінгу.
+
+```bash
+bash scripts/deploy.sh
+```
